@@ -19,33 +19,33 @@ import com.shad.service.CategoryService;
 @RequestMapping("/api/v1/category")
 public class CategoryController {
 
-	@Autowired
-	private CategoryService categoryService;
+    @Autowired
+    private CategoryService categoryService;
 
-	@PostMapping("/save-category")
-	public ResponseEntity<?> savedCategory(@RequestBody Category category) {
-		Boolean savedCategory = categoryService.saveCategory(category);
+    @PostMapping("/save-category")
+    public ResponseEntity<?> savedCategory(@RequestBody Category category) {
+        Boolean savedCategory = categoryService.saveCategory(category);
 
-		if (savedCategory) {
-			return new ResponseEntity<>("Saved Success Category", HttpStatus.CREATED);
+        if (savedCategory) {
+            return new ResponseEntity<>("Saved Success Category", HttpStatus.CREATED);
 
-		} else {
-			return new ResponseEntity<>(" Not Saved Success Category", HttpStatus.INTERNAL_SERVER_ERROR);
+        } else {
+            return new ResponseEntity<>(" Not Saved Success Category", HttpStatus.INTERNAL_SERVER_ERROR);
 
-		}
-	}
+        }
+    }
 
-	@GetMapping("/category")
-	public ResponseEntity<?> getAllCategory() {
-		List<Category> categories = categoryService.getAllCategory();
+    @GetMapping("/category")
+    public ResponseEntity<?> getAllCategory() {
+        List<Category> categories = categoryService.getAllCategory();
 
-		if (CollectionUtils.isEmpty(categories)) {
-			return ResponseEntity.noContent().build();
+        if (CollectionUtils.isEmpty(categories)) {
+            return ResponseEntity.noContent().build();
 
-		} else {
-			return new ResponseEntity<>(categories, HttpStatus.OK);
-		}
+        } else {
+            return new ResponseEntity<>(categories, HttpStatus.OK);
+        }
 
-	}
+    }
 
 }
