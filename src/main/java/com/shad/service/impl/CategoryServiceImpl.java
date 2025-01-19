@@ -15,6 +15,8 @@ import com.shad.entity.Category;
 import com.shad.repository.CategoryRepository;
 import com.shad.service.CategoryService;
 
+import javax.swing.text.html.Option;
+
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
@@ -38,14 +40,31 @@ public class CategoryServiceImpl implements CategoryService {
         category.setDescription(categoryDto.getDescription());
         category.setIsActive(categoryDto.getIsActive());*/
         Category category = modelMapper.map(categoryDto, Category.class);
-        category.setIsDeleted(false);
-        category.setCreatedBy(1);
-        category.setCreatedOn(new Date());
+        if (ObjectUtils.isEmpty(category.getId())) {
+            category.setIsDeleted(false);
+            category.setCreatedBy(1);
+            category.setCreatedOn(new Date());
+        } else {
+            updateCategory(category);
+        }
+
         Category savedCategory = categoryRepository.save(category);
         if (ObjectUtils.isEmpty(savedCategory)) {
             return false;
         }
         return true;
+    }
+
+    private void updateCategory(Category category) {
+        Optional<Category> findById = categoryRepository.findById(category.getId());
+        if (findById.isPresent()) {
+            Category existsCategory = findById.get();
+            category.setCreatedBy(existsCategory.getCreatedBy());
+            category.setCreatedOn(existsCategory.getCreatedOn());
+            category.setIsDeleted(existsCategory.getIsDeleted());
+            category.setUpdatedBy(1);
+            category.setUpdatedOn(new Date());
+        }
     }
 
     @Override
