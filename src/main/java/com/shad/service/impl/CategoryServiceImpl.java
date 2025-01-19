@@ -3,6 +3,9 @@ package com.shad.service.impl;
 import java.util.Date;
 import java.util.List;
 
+import com.shad.dto.request.CategoryDto;
+import com.shad.dto.response.CategoryResponse;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -14,27 +17,53 @@ import com.shad.service.CategoryService;
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
-	@Autowired
-	private CategoryRepository categoryRepository;
+    @Autowired
+    private CategoryRepository categoryRepository;
+    @Autowired
+    private ModelMapper modelMapper;
 
-	@Override
-	public Boolean saveCategory(Category category) {
-		category.setIsDeleted(false);
-		category.setCreatedBy(1);
-		category.setCreatedOn(new Date());
-		Category savedCategory = categoryRepository.save(category);
+    @Override
+    public Boolean saveCategory(CategoryDto categoryDto) {
+		/*categoryDto.setIsDeleted(false);
+		categoryDto.setCreatedBy(1);
+		categoryDto.setCreatedOn(new Date());
+		Category savedCategory = categoryRepository.save(categoryDto);
 		if (ObjectUtils.isEmpty(savedCategory)) {
 
 			return false;
-		}
+		}*/
+        /*Category category = new Category();
+        category.setName(categoryDto.getName());
+        category.setDescription(categoryDto.getDescription());
+        category.setIsActive(categoryDto.getIsActive());*/
+        Category category = modelMapper.map(categoryDto, Category.class);
+        category.setIsDeleted(false);
+        category.setCreatedBy(1);
+        category.setCreatedOn(new Date());
+        Category savedCategory = categoryRepository.save(category);
+        if (ObjectUtils.isEmpty(savedCategory)) {
+            return false;
+        }
+        return true;
+    }
 
-		return true;
-	}
+    @Override
+    public List<CategoryDto> getAllCategory() {
+        List<Category> categories = categoryRepository.findAll();
 
-	@Override
-	public List<Category> getAllCategory() {
-		List<Category> categories = categoryRepository.findAll();
-		return categories;
-	}
+        List<CategoryDto> categoryDtoList = categories.stream().map(cat -> modelMapper.map(cat,
+                CategoryDto.class)).toList();
+
+        return categoryDtoList;
+    }
+
+    @Override
+    public List<CategoryResponse> getActiveCategory() {
+        List<Category> categories = categoryRepository.findByIsActiveTrue();
+        List<CategoryResponse> categoryResponses = categories.stream()
+                .map(cat -> modelMapper.map(cat, CategoryResponse.class))
+                .toList();
+        return categoryResponses;
+    }
 
 }
