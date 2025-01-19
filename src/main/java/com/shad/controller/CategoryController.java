@@ -1,5 +1,6 @@
 package com.shad.controller;
 
+import java.net.http.HttpHeaders;
 import java.util.List;
 
 import com.shad.dto.request.CategoryDto;
@@ -8,11 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.util.ObjectUtils;
+import org.springframework.web.bind.annotation.*;
 
 import com.shad.entity.Category;
 import com.shad.service.CategoryService;
@@ -37,7 +35,7 @@ public class CategoryController {
         }
     }
 
-    @GetMapping("/category")
+    @GetMapping("/")
     public ResponseEntity<?> getAllCategory() {
         List<CategoryDto> categories = categoryService.getAllCategory();
 
@@ -50,7 +48,7 @@ public class CategoryController {
 
     }
 
-    @GetMapping("/active-category")
+    @GetMapping("/active")
     public ResponseEntity<?> getActiveCategory() {
         List<CategoryResponse> categories = categoryService.getActiveCategory();
 
@@ -61,6 +59,25 @@ public class CategoryController {
             return new ResponseEntity<>(categories, HttpStatus.OK);
         }
 
+    }
+
+    @GetMapping("{id}")
+    public ResponseEntity<?> getCategoryDetailsById(@PathVariable Integer id) {
+        CategoryDto categoryDto = categoryService.getCategoryById(id);
+        if (ObjectUtils.isEmpty(categoryDto)) {
+            return new ResponseEntity<>("Category not found with Id=" + id, HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(categoryDto, HttpStatus.OK);
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<?> deleteCategoryById(@PathVariable Integer id) {
+        Boolean deleted = categoryService.deleteCategory(id);
+        if (deleted) {
+            return new ResponseEntity<>("Category Deleted Successfully", HttpStatus.OK);
+
+        }
+        return new ResponseEntity<>("Category Not Deleted", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }

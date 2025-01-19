@@ -2,6 +2,7 @@ package com.shad.service.impl;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import com.shad.dto.request.CategoryDto;
 import com.shad.dto.response.CategoryResponse;
@@ -49,7 +50,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<CategoryDto> getAllCategory() {
-        List<Category> categories = categoryRepository.findAll();
+        List<Category> categories = categoryRepository.findByIsDeletedFalse();
 
         List<CategoryDto> categoryDtoList = categories.stream().map(cat -> modelMapper.map(cat,
                 CategoryDto.class)).toList();
@@ -59,11 +60,33 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<CategoryResponse> getActiveCategory() {
-        List<Category> categories = categoryRepository.findByIsActiveTrue();
+        List<Category> categories = categoryRepository.findByIsActiveTrueAndIsDeletedFalse();
         List<CategoryResponse> categoryResponses = categories.stream()
                 .map(cat -> modelMapper.map(cat, CategoryResponse.class))
                 .toList();
         return categoryResponses;
+    }
+
+    @Override
+    public CategoryDto getCategoryById(Integer id) {
+        Optional<Category> findByCategory = categoryRepository.findByIdAndIsDeletedFalse(id);
+        if (findByCategory.isPresent()) {
+            Category category = findByCategory.get();
+            return modelMapper.map(category, CategoryDto.class);
+        }
+        return null;
+    }
+
+    @Override
+    public Boolean deleteCategory(Integer id) {
+        Optional<Category> findByCategory = categoryRepository.findById(id);
+        if (findByCategory.isPresent()) {
+            Category category = findByCategory.get();
+            category.setIsDeleted(true);
+            categoryRepository.save(category);
+            return true;
+        }
+        return false;
     }
 
 }
