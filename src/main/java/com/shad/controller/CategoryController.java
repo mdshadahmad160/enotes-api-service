@@ -2,6 +2,8 @@ package com.shad.controller;
 
 import java.util.List;
 
+import com.shad.dto.request.CategoryDto;
+import com.shad.dto.response.CategoryResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +25,8 @@ public class CategoryController {
     private CategoryService categoryService;
 
     @PostMapping("/save-category")
-    public ResponseEntity<?> savedCategory(@RequestBody Category category) {
-        Boolean savedCategory = categoryService.saveCategory(category);
+    public ResponseEntity<?> savedCategory(@RequestBody CategoryDto categoryDto) {
+        Boolean savedCategory = categoryService.saveCategory(categoryDto);
 
         if (savedCategory) {
             return new ResponseEntity<>("Saved Success Category", HttpStatus.CREATED);
@@ -37,7 +39,20 @@ public class CategoryController {
 
     @GetMapping("/category")
     public ResponseEntity<?> getAllCategory() {
-        List<Category> categories = categoryService.getAllCategory();
+        List<CategoryDto> categories = categoryService.getAllCategory();
+
+        if (CollectionUtils.isEmpty(categories)) {
+            return ResponseEntity.noContent().build();
+
+        } else {
+            return new ResponseEntity<>(categories, HttpStatus.OK);
+        }
+
+    }
+
+    @GetMapping("/active-category")
+    public ResponseEntity<?> getActiveCategory() {
+        List<CategoryResponse> categories = categoryService.getActiveCategory();
 
         if (CollectionUtils.isEmpty(categories)) {
             return ResponseEntity.noContent().build();
