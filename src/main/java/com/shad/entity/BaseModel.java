@@ -6,10 +6,16 @@ import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * BaseModel is a base class for all entity classes in the application.
+ * It contains common fields that are shared across multiple entities.
+ *
+ * @author shad Ahmad
+ */
 @Getter
 @Setter
 @MappedSuperclass
-public class BaseEntity {
+public class BaseModel {
 
 	private Boolean isActive;
 
